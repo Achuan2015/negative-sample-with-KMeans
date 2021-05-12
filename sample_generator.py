@@ -2,6 +2,7 @@ from collections import defaultdict
 import os
 import pickle
 import numpy as np
+import pandas as pd
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.lib.shape_base import _make_along_axis_idx
 from sklearn import cluster
@@ -52,7 +53,7 @@ class Sample_Generator(object):
             cluster_mapping[i] = list(index)
         return y_pred, cluster_mapping
     
-    def generate(self, file_path, rate=0.25, n_cluster=256):
+    def generate(self, file_path, rate=0.25, n_cluster=256, is_save=False):
         """
         考虑到不同的问题学习的难度不一致，这一点会体现在对应问题的拓展问的个数上
         params: rate: 一个样本生成 正/副 样本对的个数占对应问题样本的比例
@@ -74,6 +75,9 @@ class Sample_Generator(object):
             negative_sample = [(input.content, self.data_indexer.get_alias(alias_id), 0) for alias_id in negative_candidates]
             sample.extend(positive_sample)
             sample.extend(negative_sample)
+        if is_save:
+            dfs = pd.DataFrame(sample, columns=['query', 'candidate', 'label'])
+            dfs.to_csv('data/sample.csv', index=False, sep='\t')
         return sample
         
     def generate_positie_sample(self, alias_ques, num):
