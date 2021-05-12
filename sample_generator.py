@@ -49,7 +49,7 @@ class Sample_Generator(object):
         cluster_mapping = defaultdict()
         for i in range(n_cluster):
             index = np.where(y_pred == i)[0]
-            cluster_mapping[i] = index
+            cluster_mapping[i] = list(index)
         return y_pred, cluster_mapping
     
     def generate(self, file_path, rate=0.25, n_cluster=256):
