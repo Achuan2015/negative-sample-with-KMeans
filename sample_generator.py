@@ -53,7 +53,7 @@ class Sample_Generator(object):
             cluster_mapping[i] = list(index)
         return y_pred, cluster_mapping
     
-    def generate(self, file_path, rate=0.25, n_cluster=256, is_save=False):
+    def generate_with_one_by_one(self, file_path, rate=0.25, n_cluster=256, is_save=False):
         """
         考虑到不同的问题学习的难度不一致，这一点会体现在对应问题的拓展问的个数上
         params: rate: 一个样本生成 正/副 样本对的个数占对应问题样本的比例
@@ -93,6 +93,41 @@ class Sample_Generator(object):
             if inputs[target].alias_id not in candidates and inputs[target].question_id != question_id:
                 candidates.append(inputs[target].alias_id)
         return candidates
+    
+    def generate_random_sample(self, values, inputs, rate):
+        number = len(values) * rate
+        sample = []
+        positive_sample = []
+        negative_sample = []
+        while len(positive_sample) + len(negative_sample) <= number * 2:
+            pair = np.random.choice(values, size=2, replace=False)
+            pair_set = set(pair)
+            if inputs[pair[0]].question_id == inputs[pair[1]].question_id:
+                if len(positive_sample) <= number:
+                    if pair_set not in positive_sample:
+                        positive_sample.append(pair_set)
+                        sample.append(inputs[pair[0]].content, inputs[pair[1]].content, 1)
+            else:
+                if len(negative_sample) <= number:
+                    if pair_set not in negative_sample:
+                        negative_sample.append(pair_set)
+                        sample.append(inputs[pair[0]].content, inputs[pair[1]].content, 0)
+        return sample        
+            
+              
+    def generate_with_random_sample(self, file_path, rate=1, n_cluster=256, is_save=False):
+        sample = []
+        inputs = self.get_inputs(file_path)
+        vectors = self.get_corpus_vectors(inputs)
+        y_pred, cluster_mapping = self.fit_predict(vectors, n_cluster=n_cluster)
+        for cluster_id, values in cluster_mapping.items():
+            print('cluster_id', cluster_id)
+            cluster_sample = self.generate_random_sample(values, inputs, rate)
+            sample.extend(cluster_sample)
+        if is_save:
+            dfs = pd.DataFrame(sample, columns=['query', 'candidate', 'label'])
+            dfs.to_csv('data/sample.csv', index=False, sep='\t')
+        return sample
 
                    
 sample_generator = Sample_Generator()
