@@ -20,7 +20,8 @@ class Data_Indexer(object):
         self.alias2skill = dict(zip(dfs['index'], dfs['skill_id']))
         self.alias2content = dict(zip(dfs['index'], dfs['alias']))
         for question_id in dfs['question_id'].drop_duplicates().tolist():
-            self.question2alias[question_id] = dfs[dfs['question_id'] == question_id]['alias_id'].tolist()
+            print('question_id', question_id)
+            self.question2alias[question_id] = dfs[dfs['question_id'] == question_id]['index'].tolist()
 
     def generate_inputs(self, path='data/faq_corpus_with_index.xlsx'):
         dfs = pd.read_excel(path)
