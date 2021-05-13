@@ -15,23 +15,16 @@ class Data_Indexer(object):
     
     def init(self, path='data/faq_corpus_with_index.xlsx'):
         dfs = pd.read_excel(path)
-        for _, row in dfs.iterrows():
-            self.alias2category[row['index']] = row['category_id']
-            self.alias2question[row['index']] = row['question_id']
-            self.alias2skill[row['index']] = row['skill_id']
-            self.alias2content[row['index']] = row['alias']
-            self.question2alias[row['question_id']].append(row['index'])
-        
+        self.alias2category = dict(zip(dfs['index'], dfs['category_id']))
+        self.alias2question = dict(zip(dfs['index'], dfs['question_id']))
+        self.alias2skill = dict(zip(dfs['index'], dfs['skill_id']))
+        self.alias2content = dict(zip(dfs['index'], dfs['alias']))
+        for question_id in dfs['question_id'].drop_duplicates().tolist():
+            self.question2alias[question_id] = dfs[dfs['question_id'] == question_id]['alias_id'].tolist()
+
     def generate_inputs(self, path='data/faq_corpus_with_index.xlsx'):
         dfs = pd.read_excel(path)
-        inputs = []
-        for _, row in dfs.iterrows():
-            input_instance = Alias(row['alias'],
-                                   row['index'],
-                                   row['question_id'],
-                                   row['skill_id'],
-                                   row['category_id'])
-            inputs.append(input_instance)
+        inputs = dfs[['alias', 'index', 'question_id', 'skill_id', 'category_id']].apply(lambda x: Alias(x[0], x[1], x[2], x[3], x[4])).tolist()
         return inputs
     
     def get_alias_ques(self, qusetion_id):

@@ -106,12 +106,12 @@ class Sample_Generator(object):
                 if len(positive_sample) <= number:
                     if pair_set not in positive_sample:
                         positive_sample.append(pair_set)
-                        sample.append(inputs[pair[0]].content, inputs[pair[1]].content, 1)
+                        sample.append((inputs[pair[0]].content, inputs[pair[1]].content, 1))
             else:
                 if len(negative_sample) <= number:
                     if pair_set not in negative_sample:
                         negative_sample.append(pair_set)
-                        sample.append(inputs[pair[0]].content, inputs[pair[1]].content, 0)
+                        sample.append((inputs[pair[0]].content, inputs[pair[1]].content, 0))
         return sample        
             
               
