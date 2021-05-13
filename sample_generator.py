@@ -63,12 +63,13 @@ class Sample_Generator(object):
         vectors = self.get_corpus_vectors(inputs)
         y_pred, cluster_mapping = self.fit_predict(vectors, n_cluster=n_cluster)
         for idx, input in enumerate(inputs):
+            print('idx', idx)
             cluster_id = y_pred[idx]
             cluster_ques = cluster_mapping[cluster_id]
             alias_ques = self.data_indexer.get_alias_ques(input.question_id)
             num = int(len(alias_ques)/4)
             if input.alias_id in alias_ques:
-                alias_ques.pop(input.alias_id)
+                alias_ques.remove(input.alias_id)
             positive_candidates = self.generate_positie_sample(alias_ques, num)
             negative_candidates = self.generate_negative_sample(input, cluster_ques, inputs, num)
             positive_sample = [(input.content, self.data_indexer.get_alias(alias_id), 1) for alias_id in positive_candidates]
@@ -88,7 +89,7 @@ class Sample_Generator(object):
         candidates = []
         question_id = input.question_id
         while len(candidates) < num:
-            target = np.random.choice(cluster_ques, size=1)
+            target = np.random.choice(cluster_ques)
             if inputs[target].alias_id not in candidates and inputs[target].question_id != question_id:
                 candidates.append(inputs[target].alias_id)
         return candidates
