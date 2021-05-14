@@ -6,6 +6,8 @@ import pandas as pd
 from numpy.core.arrayprint import _none_or_positive_arg
 from numpy.lib.shape_base import _make_along_axis_idx
 from sklearn import cluster
+from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import as_completed
 from data_indexer import data_indexer
 from compute_embedding import compute_embedding
 from k_means import K_Means
@@ -119,11 +121,24 @@ class Sample_Generator(object):
         sample = []
         inputs = self.get_inputs(file_path)
         vectors = self.get_corpus_vectors(inputs)
-        y_pred, cluster_mapping = self.fit_predict(vectors, n_cluster=n_cluster)
-        for cluster_id, values in cluster_mapping.items():
-            print('cluster_id', cluster_id)
-            cluster_sample = self.generate_random_sample(values, inputs, rate)
-            sample.extend(cluster_sample)
+        max_task_number = 46
+        if os.path.exists('data/cluster_result.pkl'):
+            with open('data/cluster_result.pkl', 'rb') as f:
+                cluster_result = pickle.load(f)
+            y_pred = cluster_result['y_pred']
+            cluster_mapping = cluster_result['cluster_mapping']
+        else:
+            y_pred, cluster_mapping = self.fit_predict(vectors, n_cluster=n_cluster)
+            with open('data/cluster_result.pkl', 'wb') as f:
+                cluster_result = pickle.dump({'y_pred': y_pred, 'cluster_mapping': cluster_mapping}, f)
+        print('begin to generate sample')
+        with ProcessPoolExecutor(max_task_number) as exectuor:
+            fs = {exectuor.submit(self.generate_random_sample, values, inputs, rate):cluster_id 
+                                for cluster_id, values in cluster_mapping.items()}
+            for future in as_completed(fs):
+                cluster_id = fs[future]
+                sample.extend(future.result())
+                print(f'cluster_id:{cluster_id} generate sample finish')
         if is_save:
             dfs = pd.DataFrame(sample, columns=['query', 'candidate', 'label'])
             dfs.to_csv('data/sample.csv', index=False, sep='\t')
