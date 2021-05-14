@@ -101,7 +101,11 @@ class Sample_Generator(object):
         sample = []
         positive_sample = []
         negative_sample = []
+        count = 0
         while len(positive_sample) + len(negative_sample) <= number * 2:
+            if count >= 1000000:
+                print(f'cluster sample exceed max time, it contains:{len(values)}')
+                break
             pair = np.random.choice(values, size=2, replace=False)
             pair_set = set(pair)
             if inputs[pair[0]].question_id == inputs[pair[1]].question_id:
@@ -114,10 +118,11 @@ class Sample_Generator(object):
                     if pair_set not in negative_sample:
                         negative_sample.append(pair_set)
                         sample.append((inputs[pair[0]].content, inputs[pair[1]].content, 0))
+            count +=1
         return sample        
             
               
-    def generate_with_random_sample(self, file_path, rate=1, n_cluster=256, is_save=False):
+    def generate_with_random_sample(self, file_path, rate=1, n_cluster=38, is_save=False):
         sample = []
         inputs = self.get_inputs(file_path)
         vectors = self.get_corpus_vectors(inputs)
@@ -141,7 +146,7 @@ class Sample_Generator(object):
                 print(f'cluster_id:{cluster_id} generate sample finish')
         if is_save:
             dfs = pd.DataFrame(sample, columns=['query', 'candidate', 'label'])
-            dfs.to_csv('data/sample.csv', index=False, sep='\t')
+            dfs.to_csv(f'data/sample_{n_cluster}_{rate}.csv', index=False, sep='\t')
         return sample
 
                    
