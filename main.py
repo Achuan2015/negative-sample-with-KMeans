@@ -6,4 +6,4 @@ if __name__ == "__main__":
     w2v_path = "data/vector.zhihu.word"
     sample_generator.init(file_path, w2v_path)
     # sample_generator.generate_with_one_by_one(file_path)
-    sample_generator.generate_with_random_sample(file_path)
+    sample_generator.generate_with_random_sample(file_path, is_save=True)
