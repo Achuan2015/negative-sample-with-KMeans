@@ -1,7 +1,7 @@
 from typing import DefaultDict
 import pandas as pd
 from collections import defaultdict
-from alias import Alias
+from alias import Alias, Sentence
 
 
 class Data_Indexer(object):
@@ -33,4 +33,25 @@ class Data_Indexer(object):
     def get_alias(self, alias_id):
         return self.alias2content[alias_id]
 
+class Sentence_Index(object):
+
+    def __init__(self):
+        self.index2dimension = defaultdict()
+        self.index2intent = defaultdict()
+        self.index2content = defaultdict()
+        self.intent2index = defaultdict(list)
+
+    def init(self, path='data/intent_corpus_with_index.csv'):
+        dfs = pd.read_csv(path, sep='\t')
+        self.index2dimension = dict(zip(dfs['index'], dfs['dimension']))
+        self.index2intent = dict(zip(dfs['index'], dfs['intent']))
+        self.index2content = dict(zip(dfs['index'], dfs['content']))
+        for intent in dfs['intent'].drop_duplicates().tolist():
+            self.intent2index[intent] = dfs[dfs['intent'] == intent]['index'].tolist()
+    
+    def generate_inputs(self, path='data/intent_corpus_with_index.csv'):
+        dfs = pd.read_csv(path, sep='\t')
+        return dfs[['content', 'index', 'intent', 'dimension']]
+
 data_indexer = Data_Indexer()
+sentence_index = Sentence_Index()
