@@ -4,6 +4,8 @@ from sample_generator import sample_generator
 def generate_ssc_sample():
     '''
     原始SSC-BOT语料支持的数据对构造方式
+
+    数据格式要求较高，需要包含 question_id， skill_id 等字段
     '''
     file_path = "data/faq_corpus_with_index.xlsx"
     w2v_path = "data/vector.zhihu.word_100"
@@ -13,7 +15,9 @@ def generate_ssc_sample():
 
 def generate_huaxiabank_sample():
     '''
-    更加通用的数据对构造方式
+    更加通用的数据对构造方式(2022.02.01)
+
+    数据格式要求进一步简化，要求提供question 对应的意图名称，以及意图名称对应的大的分类（要支持只有一个分类的情况）
     '''
     file_path = "data/intent_corpus_with_index.csv"
     w2v_path = "data/vector.zhihu.word_100"
