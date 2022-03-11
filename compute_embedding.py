@@ -14,8 +14,10 @@ class Compute_Embedding(object):
         self.w2v = w2v = W2V(w2v_path)
 
     def compute(self, text):
+        print('text:', text)
         words = Jieba_Tokenizer.cut(text)
         vectors = []
+        print('words:', words)
         for word in words:
             vector = self.w2v[word]
             vectors.append(vector)
