@@ -2,6 +2,12 @@ import pandas as pd
 from pathlib import Path
 
 
+def read_output2common(path, common_columns = ['skill', 'category1', 'question', 'alias']):
+    dfs = pd.read_csv(path, sep='\t')
+    dfs_common = dfs[common_columns]
+    return dfs_common
+    
+
 def read_data(path):
     if path.endswith('excel'):
         return pd.read_excel(path)
@@ -41,9 +47,15 @@ def output2file(dfs, path='faq_corpus_20220311.csv'):
 def main():
     dir = 'input_data'
     dir = Path(dir)
+    data_dfs = []
     for path in dir.glob('*20220311.xlsx'):
-        print(path)
-
+        dfs = read_data(path)
+        dfs_rename = rename_column(dfs)
+        dfs_ffill = ffill_common_column(dfs_rename)
+        data_dfs.append(dfs_ffill)
+    dfs_merge = merge_data(data_dfs)
+    dfs_output = add_id_mapping(dfs_merge)
+    output2file(dfs_output)
 
 if __name__ == '__main__':
     main()
