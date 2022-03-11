@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 
 
 def read_data(path):
@@ -38,8 +39,11 @@ def output2file(dfs, path='faq_corpus_20220311.csv'):
 
 
 def main():
-    pass
+    dir = 'input_data'
+    dir = Path(dir)
+    for path in dir.glob('*20220311.xlsx'):
+        print(path)
 
 
 if __name__ == '__main__':
-    pass
+    main()
