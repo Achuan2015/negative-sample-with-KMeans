@@ -2,17 +2,14 @@ import pandas as pd
 from pathlib import Path
 
 
-def read_output2common(path, common_columns = ['skill', 'category1', 'question', 'alias']):
+def read_previous_data(path, common_columns = ['skill', 'category1', 'question', 'alias']):
     dfs = pd.read_csv(path, sep='\t')
     dfs_common = dfs[common_columns]
     return dfs_common
     
 
 def read_data(path):
-    if path.endswith('excel'):
-        return pd.read_excel(path)
-    if path.endswith('csv'):
-        return pd.read_csv(path, sep='\t')\
+    return pd.read_excel(path)
 
 def rename_column(dfs):
     dfs = dfs[['技能', '一级分类', '标准问(必填)', '答案(最多10条)','扩展问(最多1000条)']]
@@ -53,6 +50,9 @@ def main():
         dfs_rename = rename_column(dfs)
         dfs_ffill = ffill_common_column(dfs_rename)
         data_dfs.append(dfs_ffill)
+    dfs_previous = read_previous_data('data/faq_corpus_with_index.csv')
+    data_dfs.append(dfs_previous)
+    print('data_dfs length:', len(data_dfs))
     dfs_merge = merge_data(data_dfs)
     dfs_output = add_id_mapping(dfs_merge)
     output2file(dfs_output)
