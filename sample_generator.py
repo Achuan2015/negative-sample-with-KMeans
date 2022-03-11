@@ -144,7 +144,7 @@ class Sample_Generator(object):
                 print(f'cluster_id:{cluster_id} generate sample finish')
         if is_save:
             dfs = pd.DataFrame(sample, columns=['query', 'candidate', 'label'])
-            dfs.to_csv(f'data/sample_{n_cluster}_{rate}.csv', index=False, sep='\t')
+            dfs.to_csv(f'output_data/ssc_faq_{n_cluster}_{rate}.csv', index=False, sep='\t')
         return sample
 
                    

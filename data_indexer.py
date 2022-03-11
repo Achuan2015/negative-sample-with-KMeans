@@ -30,7 +30,8 @@ class Data_Indexer(object):
             dfs = pd.read_excel(path)
         else:
             dfs = pd.read_csv(path, sep='\t')
-        inputs = dfs[['alias', 'index', 'question_id', 'skill_id', 'category1_id']].apply(lambda x: Alias(x[0], x[1], x[2], x[3], x[4])).tolist()
+        #inputs = dfs[['alias', 'index', 'question_id', 'skill_id', 'category1_id']].apply(lambda x: Alias(x[0], x[1], x[2], x[3], x[4])).tolist()
+        inputs = dfs.apply(lambda row: Alias(row['alias'], row['index'], row['question_id'], row['skill_id'], row['category1_id']), axis=1).tolist()
         return inputs
     
     def get_alias_ques(self, qusetion_id):
