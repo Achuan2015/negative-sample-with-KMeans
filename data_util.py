@@ -24,7 +24,7 @@ def ffill_common_column(dfs):
 
 def merge_data(dfs_list):
     dfs_merge = pd.concat(dfs_list, ignore_index=True)
-    dfs_filter = dfs_merge.drop_duplicates(subset='alias', keep='first',ignore_index=True)
+    dfs_filter = dfs_merge.dropna().drop_duplicates(subset='alias', keep='first',ignore_index=True)
     return dfs_filter
 
 def add_id_mapping(dfs, column_maps = ['skill', 'category1', 'question']):
