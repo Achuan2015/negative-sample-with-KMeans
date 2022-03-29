@@ -8,12 +8,12 @@ def generate_ssc_sample():
     数据格式要求较高，需要包含 question_id， skill_id 等字段
     '''
     #file_path = "data/faq_corpus_with_index.xlsx"
-    file_path = 'output_data/faq_corpus_20220311.csv'
+    file_path = 'output_data/faq_corpus_20220329.csv'
     #w2v_path = "data/vector.zhihu.word_100"
     w2v_path = "data/vector.zhihu.word"
     sample_generator.init(file_path, w2v_path)
     # sample_generator.generate_with_one_by_one(file_path)
-    sample_generator.generate_with_random_sample(file_path, rate=1, n_cluster=55, is_save=True)
+    sample_generator.generate_with_random_sample(file_path, rate=1, n_cluster=58, is_save=True)
 
 def generate_huaxiabank_sample():
     '''
