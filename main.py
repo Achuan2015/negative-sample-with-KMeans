@@ -1,4 +1,5 @@
 from sample_generator import sample_generator
+from bot_sample_generator import bot_sample_generator
 
 
 def generate_ssc_sample():
@@ -26,15 +27,15 @@ def generate_huaxiabank_sample():
     sample_generator.init(file_path, w2v_path)
     # sample_generator_tool.generate_with_random_sample()
 
-def generate_selfdefine_bot_samole():
-    file_path = ""
-    w2v_path = "data/vector.zhihu.word_100"
-    output_path = "output_data/self_define_corpus_20220516.csv"
-    # w2v_path = "data/vector.zhihu.word"
-    sample_generator.init(file_path, w2v_path)
-    sample_generator.generate_with_random_sample(file_path, rate=1, n_cluster=10, is_save=True, output_path=output_path)
+def generate_selfdefine_bot_sample():
+    file_path = "data/bot_corpus_20220516.csv"
+    # w2v_path = "data/vector.zhihu.word_100"
+    output_path = "output_data/bot_train_20220516.csv"
+    w2v_path = "data/vector.zhihu.word"
+    bot_sample_generator.init(file_path, w2v_path)
+    bot_sample_generator.generate_with_random_sample(file_path, output_path, rate=1, n_cluster=10, is_save=True)
 
 
 if __name__ == '__main__':
     # generate_ssc_sample()
-    generate_huaxiabank_sample()
+    generate_selfdefine_bot_sample()
