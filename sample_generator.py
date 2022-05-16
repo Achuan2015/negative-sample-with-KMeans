@@ -124,7 +124,7 @@ class Sample_Generator(object):
         sample = []
         inputs = self.get_inputs(file_path)
         vectors = self.get_corpus_vectors(inputs)
-        max_task_number = 46
+        max_task_number = 10
         if os.path.exists('data/cluster_result.pkl'):
             with open('data/cluster_result.pkl', 'rb') as f:
                 cluster_result = pickle.load(f)
@@ -144,7 +144,7 @@ class Sample_Generator(object):
                 print(f'cluster_id:{cluster_id} generate sample finish')
         if is_save:
             dfs = pd.DataFrame(sample, columns=['query', 'candidate', 'label'])
-            dfs.to_csv(f'output_data/huaxia_faq_{n_cluster}_{rate}.csv', index=False, sep='\t')
+            dfs.to_csv(f'output_data/huaxia_faq_{n_cluster}_{rate}_20220330.csv', index=False, sep='\t')
         return sample
 
                    

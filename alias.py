@@ -15,3 +15,12 @@ class Sentence:
         self.index = index
         self.intent = intent
         self.dimension = dimension
+
+class Bot_Alias:
+    
+    def __init__(self, content, corpus_id, intent_id, category, vector=None):
+        self.content = content
+        self.corpus_id = corpus_id
+        self.intent_id = intent_id
+        self.category = category
+        self.vector = vector
