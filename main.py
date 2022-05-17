@@ -33,9 +33,18 @@ def generate_selfdefine_bot_sample():
     output_path = "output_data/bot_train_20220516.csv"
     w2v_path = "data/vector.zhihu.word"
     bot_sample_generator.init(file_path, w2v_path)
-    bot_sample_generator.generate_with_random_sample(file_path, output_path, rate=1, n_cluster=10, is_save=True)
+    bot_sample_generator.generate_with_random_sample(file_path, output_path, rate=2, n_cluster=8, is_save=True)
+
+def generate_multi_intent_bot_sample():
+    file_path = "data/bot_corpus_20220516.csv"
+    # w2v_path = "data/vector.zhihu.word_100"
+    output_path = "output_data/bot_multi_intent_train_20220517.csv"
+    # w2v_path = "data/vector.zhihu.word"
+    # bot_sample_generator.init(file_path, w2v_path)
+    bot_sample_generator.generate_multi_intent_sample(file_path, output_path, rate=3, is_save=True)
 
 
 if __name__ == '__main__':
     # generate_ssc_sample()
-    generate_selfdefine_bot_sample()
+    # generate_selfdefine_bot_sample()
+    generate_multi_intent_bot_sample()

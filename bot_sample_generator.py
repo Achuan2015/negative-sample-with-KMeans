@@ -24,24 +24,24 @@ class Bot_Sample_Generator(object):
     
     def get_inputs(self, file_path):
         inputs = []
-        if os.path.exists('data/inputs.pkl'):
-            inputs = pickle.load(open('data/inputs.pkl', 'rb'))
+        if os.path.exists('cache/inputs.pkl'):
+            inputs = pickle.load(open('cache/inputs.pkl', 'rb'))
         else:   
             inputs = self.data_indexer.generate_inputs(file_path)
-            with open('data/inputs.pkl', 'wb') as fi:
+            with open('cache/inputs.pkl', 'wb') as fi:
                 pickle.dump(inputs, fi)
         return inputs
     
     def get_corpus_vectors(self, inputs):
         vectors = []
-        if os.path.exists('data/vectors.pkl'):
-            vectors = pickle.load(open('data/vectors.pkl', 'rb'))
+        if os.path.exists('cache/vectors.pkl'):
+            vectors = pickle.load(open('cache/vectors.pkl', 'rb'))
         else:
             for instance in inputs:
                 vector = self.compute_embedding.compute(instance.content)
                 vectors.append(vector)
                 instance.vector = vector
-            with open('data/vectors.pkl', 'wb') as fv:
+            with open('cache/vectors.pkl', 'wb') as fv:
                 pickle.dump(vectors, fv)
         return vectors
 
@@ -94,8 +94,37 @@ class Bot_Sample_Generator(object):
                 candidates.append(inputs[target].alias_id)
         return candidates
     
-    def generate_random_concatenate_sample(self, *args):
-        pass
+    def generate_random_concatenate_sample(self, inputs, rate):
+        number = len(inputs) * rate
+        sample = []
+        positive_sample = []
+        negative_sample = []
+        count = 0
+        while len(positive_sample) + len(negative_sample) <= number * 2:
+            if count >= 1000000:
+                print(f'取样超过最大设定次数，终止样本生成')
+                break
+            cur_positive_sample = []
+            cur_negative_sample = []
+            pair = np.random.choice(range(len(inputs)), size=3, replace=False).tolist()
+            cur_content = inputs[pair[0]].content + inputs[pair[1]].content
+            cur_intent = [inputs[pair[0]].intent_id, inputs[pair[1]].intent_id]
+            if len(cur_content) <= 200:
+                cur_content += inputs[pair[2]].content
+                cur_intent.append(inputs[pair[2]].intent_id)
+            label = 0.8 if len(cur_intent) == 2 else 0.7
+            cur_positive_sample = [(cur_content, inputs[i].content, label) for i in pair]
+            positive_sample.extend(cur_positive_sample)
+            sample.extend(cur_positive_sample)
+            while len(cur_negative_sample) < 3:
+                idx = np.random.choice(range(len(inputs)), size=1, replace=False).tolist()[0]
+                if inputs[idx].intent_id not in cur_intent:
+                    cur_negative_sample.append((cur_content, inputs[idx].content, 0))
+            negative_sample.extend(cur_negative_sample)
+            sample.extend(cur_negative_sample)
+            count +=1
+        print(f'样本生成结束, 样本长度为：{len(sample)}')
+        return sample
     
     def generate_random_sample(self, values, inputs, rate):
         number = len(values) * rate
@@ -121,22 +150,32 @@ class Bot_Sample_Generator(object):
                         sample.append((inputs[pair[0]].content, inputs[pair[1]].content, 0))
             count +=1
         return sample        
-            
+    
+    def generate_multi_intent_sample(self, file_path, output_path, rate=1, is_save=False):
+        inputs = self.get_inputs(file_path)
+        sample = self.generate_random_concatenate_sample(inputs, rate)
+        if is_save:
+            dfs = pd.DataFrame(sample, columns=['query', 'candidate', 'label'])
+            output_path = f'_{rate}.'.join(output_path.split('.'))
+            dfs.to_csv(output_path, index=False, sep='\t')
+            print('样本保存成功')
+
+
               
     def generate_with_random_sample(self, file_path, output_path, rate=1, n_cluster=38, is_save=False):
         sample = []
         inputs = self.get_inputs(file_path)
         vectors = self.get_corpus_vectors(inputs)
-        max_task_number = 10
-        if os.path.exists('data/cluster_result.pkl'):
-            with open('data/cluster_result.pkl', 'rb') as f:
+        max_task_number = 2
+        if os.path.exists('cache/cluster_result.pkl'):
+            with open('cache/cluster_result.pkl', 'rb') as f:
                 cluster_result = pickle.load(f)
             y_pred = cluster_result['y_pred']
             cluster_mapping = cluster_result['cluster_mapping']
         else:
             print('开始聚类')
             y_pred, cluster_mapping = self.fit_predict(vectors, n_cluster=n_cluster)
-            with open('data/cluster_result.pkl', 'wb') as f:
+            with open('cache/cluster_result.pkl', 'wb') as f:
                 cluster_result = pickle.dump({'y_pred': y_pred, 'cluster_mapping': cluster_mapping}, f)
             print('聚类完成')
         print('begin to generate sample')
@@ -149,6 +188,7 @@ class Bot_Sample_Generator(object):
                 print(f'cluster_id:{cluster_id} generate sample finish')
         if is_save:
             dfs = pd.DataFrame(sample, columns=['query', 'candidate', 'label'])
+            output_path = f'_{n_cluster}_{rate}.'.join(output_path.split('.'))
             dfs.to_csv(output_path, index=False, sep='\t')
         return sample
 
