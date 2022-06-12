@@ -112,7 +112,7 @@ class Bot_Sample_Generator(object):
             if len(cur_content) <= 200:
                 cur_content += inputs[pair[2]].content
                 cur_intent.append(inputs[pair[2]].intent_id)
-            label = 0.8 if len(cur_intent) == 2 else 0.7
+            label = 0.9 if len(cur_intent) == 2 else 0.8
             cur_positive_sample = [(cur_content, inputs[i].content, label) for i in pair]
             positive_sample.extend(cur_positive_sample)
             sample.extend(cur_positive_sample)
@@ -166,7 +166,7 @@ class Bot_Sample_Generator(object):
         sample = []
         inputs = self.get_inputs(file_path)
         vectors = self.get_corpus_vectors(inputs)
-        max_task_number = 2
+        max_task_number = 4
         if os.path.exists('cache/cluster_result.pkl'):
             with open('cache/cluster_result.pkl', 'rb') as f:
                 cluster_result = pickle.load(f)

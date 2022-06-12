@@ -28,12 +28,13 @@ def generate_huaxiabank_sample():
     # sample_generator_tool.generate_with_random_sample()
 
 def generate_selfdefine_bot_sample():
-    file_path = "data/bot_corpus_20220516.csv"
+    # file_path = "data/bot_corpus_20220516.csv"
+    file_path = "data/bot_corpus_20220612_v1.csv"
     # w2v_path = "data/vector.zhihu.word_100"
-    output_path = "output_data/bot_train_20220516.csv"
+    output_path = "output_data/bot_train_20220612_v2.csv"
     w2v_path = "data/vector.zhihu.word"
     bot_sample_generator.init(file_path, w2v_path)
-    bot_sample_generator.generate_with_random_sample(file_path, output_path, rate=2, n_cluster=8, is_save=True)
+    bot_sample_generator.generate_with_random_sample(file_path, output_path, rate=1, n_cluster=50, is_save=True)
 
 def generate_multi_intent_bot_sample():
     file_path = "data/bot_corpus_20220516.csv"
@@ -46,5 +47,5 @@ def generate_multi_intent_bot_sample():
 
 if __name__ == '__main__':
     # generate_ssc_sample()
-    # generate_selfdefine_bot_sample()
-    generate_multi_intent_bot_sample()
+    generate_selfdefine_bot_sample()
+    # generate_multi_intent_bot_sample()
